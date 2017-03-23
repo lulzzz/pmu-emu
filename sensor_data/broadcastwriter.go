@@ -55,8 +55,8 @@ func (w *SimpleTsDatumBroadcastWriter) RemReader(id string) error {
 		return fmt.Errorf("Unknown reader id: %v", id)
 	}
 
-	close(reader)
 	delete(w.DataReaders, id)
+	close(reader)
 	return nil
 }
 
