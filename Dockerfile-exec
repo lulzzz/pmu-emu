@@ -1,0 +1,7 @@
+FROM alpine:3.5
+MAINTAINER mdye <mdye@us.ibm.com>
+
+ADD . /prj
+
+EXPOSE 8008
+CMD ["/prj/pmu-emu", "-v", "5", "-logtostderr"]

@@ -50,7 +50,7 @@ func NewSimpleSynchroDatumGenerator(deviceID string) <-chan SimpleTsDatum {
 			}
 
 			writer <- msg
-			time.Sleep(8 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}()
 
