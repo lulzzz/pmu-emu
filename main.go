@@ -1,14 +1,12 @@
 package main
 
 import (
-	"github.com/golang/glog"
-	//	"github.com/google/uuid"
-	"google.golang.org/grpc"
-	"net"
-
 	"flag"
-
+	"net"
 	"os"
+
+	"github.com/golang/glog"
+	"google.golang.org/grpc"
 
 	data "github.com/michaeldye/pmu-emu/sensor_data"
 	pmu_server "github.com/michaeldye/synchrophasor-proto/pmu_server"
@@ -59,7 +57,7 @@ func main() {
 	// Creates a new gRPC server
 	s := grpc.NewServer()
 	pmu_server.RegisterSynchrophasorDataServer(s, &pmuServerImpl{
-		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewSimpleSynchroDatumGenerator("clientID")),
+		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewSimpleSynchroDatumGenerator(os.Getenv("DEVICE_ID"))),
 	})
 	s.Serve(lis)
 }
