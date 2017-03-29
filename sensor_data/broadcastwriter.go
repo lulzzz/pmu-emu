@@ -49,14 +49,13 @@ func (w *SimpleTsDatumBroadcastWriter) RemReader(id string) error {
 	w.ReadersSync.Lock()
 	defer w.ReadersSync.Unlock()
 
-	var reader chan<- SimpleTsDatum
 	var exists bool
-	if reader, exists = w.DataReaders[id]; !exists {
+	if _, exists = w.DataReaders[id]; !exists {
 		return fmt.Errorf("Unknown reader id: %v", id)
 	}
 
 	delete(w.DataReaders, id)
-	close(reader)
+	// do not close reader from our side
 	return nil
 }
 

@@ -57,7 +57,7 @@ func main() {
 	// Creates a new gRPC server
 	s := grpc.NewServer()
 	pmu_server.RegisterSynchrophasorDataServer(s, &pmuServerImpl{
-		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewSimpleSynchroDatumGenerator(os.Getenv("DEVICE_ID"))),
+		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewSimpleSynchroDatumGenerator(os.Getenv("SERIAL"))),
 	})
 	s.Serve(lis)
 }
