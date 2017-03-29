@@ -32,7 +32,7 @@ type SimpleSynchroDatumGenerator struct {
 }
 
 // NewSimpleSynchroDatumGenerator creates a new SimpleSynchroDatumGenerator which writes at an interval to its DataWriter
-func NewSimpleSynchroDatumGenerator(deviceID string) <-chan SimpleTsDatum {
+func NewSimpleSynchroDatumGenerator(serial string) <-chan SimpleTsDatum {
 	writer := make(chan SimpleTsDatum)
 
 	go func() {
@@ -42,15 +42,26 @@ func NewSimpleSynchroDatumGenerator(deviceID string) <-chan SimpleTsDatum {
 			nano := time.Now().UnixNano()
 
 			msg := simpleSynchroDatum{
-				Id: fmt.Sprintf("%v-%v", deviceID, nano),
+				Id: fmt.Sprintf("%v-%v", serial, nano),
 				Ts: uint64(nano),
 				PhaseData: &pmu_server.SynchrophasorDatum_PhaseData{
-					Phase1CurrentAngle: 1,
+					Phase1CurrentAngle:     45.3,
+					Phase1CurrentMagnitude: 200,
+					Phase2CurrentAngle:     40.1,
+					Phase2CurrentMagnitude: 198,
+					Phase3CurrentAngle:     48.2,
+					Phase3CurrentMagnitude: 220,
+					Phase1VoltageAngle:     91,
+					Phase1VoltageMagnitude: 103,
+					Phase2VoltageAngle:     93,
+					Phase2VoltageMagnitude: 104,
+					Phase3VoltageAngle:     89,
+					Phase3VoltageMagnitude: 101,
 				},
 			}
 
 			writer <- msg
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}()
 
