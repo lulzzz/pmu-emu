@@ -4,15 +4,23 @@ import (
 	"flag"
 	"net"
 	"os"
+	"strconv"
 
 	"github.com/golang/glog"
 	"google.golang.org/grpc"
 
-	data "github.com/michaeldye/pmu-emu/sensor_data"
+	data "github.com/michaeldye/pmu-emu/data"
+
 	pmu_server "github.com/michaeldye/synchrophasor-proto/pmu_server"
 )
 
 const (
+	deviceIDEnvvarName               = "DEVICE_ID"
+	dataFileEnvvarName               = "DATA_FILE"
+	dataPublishPauseTimeMSEnvvarName = "DATA_PUBLISH_PAUSE_MS"
+
+	defaultDataPublishPauseTimeMS = 20
+
 	// defaults overridden by envvars
 	defaultBind = "0.0.0.0:8008"
 )
@@ -52,12 +60,35 @@ func main() {
 		os.Exit(1)
 	}
 
+	dataFile := os.Getenv(dataFileEnvvarName)
+	if dataFile == "" {
+		glog.Fatalf("Unspecified but required envvar %s", dataFileEnvvarName)
+		os.Exit(1)
+	}
+	glog.Infof("Using dataFile %v set by envvar %v", dataFile, dataFileEnvvarName)
+
+	deviceID := os.Getenv(deviceIDEnvvarName)
+	if deviceID == "" {
+		glog.Fatalf("Unspecified but required envvar %s", deviceIDEnvvarName)
+		os.Exit(1)
+	}
+	glog.Infof("Using deviceID %v set by envvar %v", deviceID, deviceIDEnvvarName)
+
+	var dataPublishPauseTimeMS int64
+	if time, err := strconv.ParseInt(os.Getenv(dataPublishPauseTimeMSEnvvarName), 10, 64); err != nil || time < 5 {
+		dataPublishPauseTimeMS = defaultDataPublishPauseTimeMS
+		glog.Infof("Using default dataPublishPauseTimeMS %v", dataPublishPauseTimeMS)
+	} else {
+		dataPublishPauseTimeMS = time
+		glog.Infof("Using dataPublishPauseTimeMS %v set by envvar %v", dataPublishPauseTimeMS, dataPublishPauseTimeMSEnvvarName)
+	}
+
 	glog.Infof("Setting up gRPC server on %v", defaultBind)
 
 	// Creates a new gRPC server
 	s := grpc.NewServer()
 	pmu_server.RegisterSynchrophasorDataServer(s, &pmuServerImpl{
-		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewSimpleSynchroDatumGenerator(os.Getenv("SERIAL"))),
+		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewFileBackedSynchroDatumGenerator(dataFile, deviceID, dataPublishPauseTimeMS)),
 	})
 	s.Serve(lis)
 }
