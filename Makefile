@@ -1,9 +1,9 @@
 SHELL := /bin/bash
 ARCH = $(shell uname -m)
-PKGS=$(shell cd $(PKGPATH)/anax; GOPATH=$(TMPGOPATH) go list ./... | gawk '$$1 !~ /vendor\// {print $$1}')
+VERSION = $(shell cat VERSION)
 
 EXECUTABLE = $(shell basename $$PWD)
-VERSION = $(shell cat VERSION)
+PKGS=$(shell go list ./... | gawk '$$1 !~ /vendor\// {print $$1}')
 
 DOCKER_IMAGE = "summit.hovitos.engineering/$(ARCH)/$(EXECUTABLE)"
 DOCKER_TAG = "$(VERSION)"
@@ -29,7 +29,7 @@ clean:
 deps: $(GOPATH)/bin/govendor
 	govendor sync
 
-# bail if there are uncommitted changes (note: this doesn't know about or check untracked, uncommitted files, or unpushed commits)
+# bail if there are uncommitted changes (note: this doesn't know about or check untracked, uncommitted files)
 dirty:
 	@echo "Checking if your local repository or index have uncommitted changes..."
 	git diff-index --quiet HEAD
@@ -63,7 +63,7 @@ test-integration: all
 	go test -v -cover -tags=integration $(PKGS)
 
 publish: dirty clean test test-integration docker-push
-	git tag $(VERSION)
+	git tag $(VERSION) -f
 	git push --tags canonical master
 
 .PHONY: clean deps docker install lint publish test test-integration
