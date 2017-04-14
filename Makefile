@@ -29,6 +29,11 @@ clean:
 deps: $(GOPATH)/bin/govendor
 	govendor sync
 
+# bail if there are uncommitted changes (note: this doesn't know about or check untracked, uncommitted files, or unpushed commits)
+dirty:
+	@echo "Checking if your local repository or index have uncommitted changes..."
+	git diff-index --quiet HEAD
+
 $(GOPATH)/bin/govendor:
 	go get -u github.com/kardianos/govendor
 
@@ -51,10 +56,14 @@ lint:
 	-go vet ./... 2>&1 | grep -vP "exit\ status|vendor/"
 
 # only unit tests
-test:
+test: all
 	go test -v -cover $(PKGS)
 
-test-integration: deps
+test-integration: all
 	go test -v -cover -tags=integration $(PKGS)
 
-.PHONY: clean deps docker install lint test test-integration
+publish: dirty clean test test-integration docker-push
+	git tag $(VERSION)
+	git push --tags canonical master
+
+.PHONY: clean deps docker install lint publish test test-integration
