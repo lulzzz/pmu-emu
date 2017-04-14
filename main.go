@@ -4,10 +4,16 @@ import (
 	"flag"
 	"net"
 	"os"
+	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/golang/glog"
+	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/tap"
 
 	data "github.com/michaeldye/pmu-emu/data"
 
@@ -47,6 +53,8 @@ func (s *pmuServerImpl) Sample(samplingFilter *pmu_server.SamplingFilter, stream
 		if err := stream.Send(datum); err != nil {
 			return err
 		}
+
+		runtime.Gosched()
 	}
 }
 
@@ -85,10 +93,31 @@ func main() {
 
 	glog.Infof("Setting up gRPC server on %v", defaultBind)
 
+	tap := grpc.InTapHandle(func(ctx context.Context, info *tap.Info) (context.Context, error) {
+		glog.V(5).Infof("New connection to RPC method: %v", info.FullMethodName)
+		glog.V(6).Infof("Context: %v", ctx)
+
+		return ctx, nil
+	})
+
+	ep := grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+		MinTime:             5 * time.Second,
+		PermitWithoutStream: true,
+	})
+
+	kp := grpc.KeepaliveParams(keepalive.ServerParameters{
+		MaxConnectionIdle: 5 * time.Second,
+		Time:              10 * time.Second,
+		Timeout:           10 * time.Second,
+	})
+
 	// Creates a new gRPC server
-	s := grpc.NewServer()
+	s := grpc.NewServer(tap, ep, kp)
+
 	pmu_server.RegisterSynchrophasorDataServer(s, &pmuServerImpl{
 		broadcast: data.NewSimpleTsDatumBroadcastWriter(data.NewFileBackedSynchroDatumGenerator(dataFile, deviceID, dataPublishPauseTimeMS)),
 	})
+
+	// start it
 	s.Serve(lis)
 }

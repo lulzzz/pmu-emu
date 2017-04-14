@@ -1,0 +1,7 @@
+FROM ##from_image##
+MAINTAINER mdye <mdye@us.ibm.com>
+
+ADD . /prj
+
+EXPOSE 8008
+CMD ["/prj/pmu-emu", "-v", "2", "-logtostderr"]

@@ -9,6 +9,10 @@ import (
 	"sync"
 )
 
+const (
+	defaultReaderQueueLength = 2 // small so they don't get backed up
+)
+
 // writers for data types
 
 // SimpleTsDatumBroadcastWriter writes TS Datum to one or more readers in unbuffered channels (so writer blocks until reader(s) consume the Datum).
@@ -55,7 +59,7 @@ func (w *SimpleTsDatumBroadcastWriter) RemReader(id string) error {
 	}
 
 	delete(w.DataReaders, id)
-	// do not close reader from our side
+	glog.V(4).Infof("Removed reader: %v", id)
 	return nil
 }
 
@@ -79,12 +83,18 @@ func (w *SimpleTsDatumBroadcastWriter) Broadcast() error {
 		} else {
 
 			// write to all readers; will block until they read which means they need to be well-behaved
-			for _, reader := range w.DataReaders {
-				reader <- d
+			for id, reader := range w.DataReaders {
+				select {
+				case reader <- d:
+					glog.Infof("Published to reader: %v", id)
+				default:
+					// Note that this doesn't close the socket or underlying gRPC connection, those are handled separately
+					glog.Infof("Connection stale or reader too slow, removing it: %v", id)
+					w.RemReader(id)
+				}
 			}
 		}
 
 		runtime.Gosched()
 	}
-
 }
