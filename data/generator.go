@@ -11,7 +11,10 @@ import (
 )
 
 // simpleSynchroDatum implements the SimpleTsDatum interface with data that can be used to fulfill the outgoing protobuf type
-type simpleSynchroDatum pmu_server.SynchrophasorDatum
+type simpleSynchroDatum struct {
+	pmu_server.SynchrophasorDatum
+	DeviceTs int64
+}
 
 // GetID returns the unique ID of this Datum
 func (s simpleSynchroDatum) ID() string {
@@ -40,12 +43,15 @@ func NewFileBackedSynchroDatumGenerator(filePath string, deviceID string, datumP
 
 	writer := make(chan SimpleTsDatum) // a blocking channel for fully-formed output Ts data
 
-	publishFn := func(phaseData *pmu_server.SynchrophasorDatum_PhaseData) {
+	publishFn := func(phaseData *pmu_server.SynchrophasorDatum_PhaseData, deviceTs int64) {
 		nano := time.Now().UnixNano()
 		msg := simpleSynchroDatum{
-			Id:        fmt.Sprintf("%v-%v", deviceID, nano),
-			Ts:        uint64(nano), // N.B. ignoring the timestamp from the source data from file b/c we loop
-			PhaseData: phaseData,
+			SynchrophasorDatum: pmu_server.SynchrophasorDatum{
+				Id:        fmt.Sprintf("%v-%v", deviceID, nano),
+				Ts:        uint64(nano), // N.B. this is our sampling time
+				PhaseData: phaseData,
+			},
+			DeviceTs: deviceTs,
 		}
 
 		writer <- msg
