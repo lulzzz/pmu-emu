@@ -8,8 +8,9 @@ Example invocation:
 
 ## Related Projects
 
- * `synchrophasor-publisher`: A client that connects to the `pmu-emu`s gRPC server, processes data it gathers, and then publishes it to a gRPC ingest Data Processing Engine (DPE), an instances of `synchrophasor-dpe`
- * `synchrophasor-dpe`: A DPE data ingest server that is connected-to by `synchrophasor-publisher` clients
+ * `synchrophasor-proto` (https://github.com/michaeldye/synchrophasor-proto): The protocol specifications for all synchrophasor data projects
+ * `synchrophasor-publisher` (https://github.com/michaeldye/synchrophasor-publisher): A client that connects to the `pmu-emu`s gRPC server, processes data it gathers, and then publishes it to a gRPC ingest Data Processing Engine (DPE), an instances of `synchrophasor-dpe`
+ * `synchrophasor-dpe` (https://github.com/michaeldye/synchrophasor-dpe): A DPE data ingest server that is connected-to by `synchrophasor-publisher` clients
 
 ## Development
 
@@ -32,9 +33,11 @@ This project include the make target `publish` that is intended to be executed a
 
 ## Building
 
-#### Considerations
+### Considerations
 
 This project requires that you build it from the proper place in your `$GOPATH`. Also note that it will automatically install `govendor` in your `$GOPATH` when executing `make deps`.
+
+### Steps
 
   make
 
