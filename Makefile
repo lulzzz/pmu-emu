@@ -64,6 +64,6 @@ test-integration: all
 
 publish: dirty clean test test-integration docker-push
 	git tag $(VERSION) -f
-	git push --tags canonical master
+	git push -f --tags canonical master
 
 .PHONY: clean deps docker install lint publish test test-integration
