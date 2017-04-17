@@ -48,6 +48,7 @@ func (s *pmuServerImpl) Sample(samplingFilter *pmu_server.SamplingFilter, stream
 			Id:        inter.ID(),
 			Ts:        inter.Timestamp(),
 			PhaseData: inter.Datum().(*pmu_server.SynchrophasorDatum_PhaseData),
+			DeviceTs:  inter.DeviceTimestamp(),
 		}
 
 		if err := stream.Send(datum); err != nil {

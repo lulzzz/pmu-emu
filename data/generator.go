@@ -13,7 +13,12 @@ import (
 // simpleSynchroDatum implements the SimpleTsDatum interface with data that can be used to fulfill the outgoing protobuf type
 type simpleSynchroDatum struct {
 	pmu_server.SynchrophasorDatum
-	DeviceTs int64
+	DeviceTs float64
+}
+
+// GetID returns the unique ID of this Datum
+func (s simpleSynchroDatum) DeviceTimestamp() float64 {
+	return s.DeviceTs
 }
 
 // GetID returns the unique ID of this Datum
@@ -31,6 +36,10 @@ func (s simpleSynchroDatum) Datum() interface{} {
 	return s.PhaseData
 }
 
+func (s simpleSynchroDatum) String() string {
+	return fmt.Sprintf("ID: %v, Timestamp: %v, DeviceTimestamp: %v, Datum: %v", s.ID(), s.Timestamp(), s.DeviceTimestamp(), s.Datum())
+}
+
 // TODO: consider making a translator here to the outgoing protobuf type so it can be more easily served via RPC
 
 // SimpleSynchroDatumGenerator generates simpleSynchroDatum type data.
@@ -43,7 +52,7 @@ func NewFileBackedSynchroDatumGenerator(filePath string, deviceID string, datumP
 
 	writer := make(chan SimpleTsDatum) // a blocking channel for fully-formed output Ts data
 
-	publishFn := func(phaseData *pmu_server.SynchrophasorDatum_PhaseData, deviceTs int64) {
+	publishFn := func(phaseData *pmu_server.SynchrophasorDatum_PhaseData, deviceTs float64) {
 		nano := time.Now().UnixNano()
 		msg := simpleSynchroDatum{
 			SynchrophasorDatum: pmu_server.SynchrophasorDatum{

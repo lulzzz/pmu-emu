@@ -14,7 +14,7 @@ func toPhaseValue(vals []interface{}, arrIdx int) (float64, error) {
 	return value, nil
 }
 
-func rawToPhaseData(raw map[string]interface{}) (*pmu_server.SynchrophasorDatum_PhaseData, int64, error) {
+func rawToPhaseData(raw map[string]interface{}) (*pmu_server.SynchrophasorDatum_PhaseData, float64, error) {
 	d := raw["d"].([]interface{})
 
 	oca, err := toPhaseValue(d, 0)
@@ -77,8 +77,8 @@ func rawToPhaseData(raw map[string]interface{}) (*pmu_server.SynchrophasorDatum_
 		return nil, 0, err
 	}
 
-	ts := raw["ts"].(interface{})
-	tsValue := ts.(int64)
+	ts := raw["t"].(interface{})
+	tsValue := ts.(float64)
 
 	return &pmu_server.SynchrophasorDatum_PhaseData{
 		Phase1CurrentAngle:     oca,

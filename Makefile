@@ -17,8 +17,8 @@ endif
 all: $(EXECUTABLE)
 
 # will always run b/c deps target is PHONY
-$(EXECUTABLE): $(shell find . -name '*.go' -not -path './vendor/*' -and -not -path './policy/tools/bhgovconfig/*') deps
-	$(COMPILE_ARGS) go build -o pmu-emu
+$(EXECUTABLE): $(shell find . -name '*.go' -not -path './vendor/*') deps
+	$(COMPILE_ARGS) go build -o $(EXECUTABLE)
 
 clean:
 	find ./vendor -maxdepth 1 -not -path ./vendor -and -not -iname "vendor.json" -print0 | xargs -0 rm -Rf

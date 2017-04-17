@@ -6,5 +6,6 @@ package data
 type SimpleTsDatum interface {
 	ID() string
 	Timestamp() uint64
+	DeviceTimestamp() float64
 	Datum() interface{}
 }

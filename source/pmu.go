@@ -96,7 +96,7 @@ func (c *ContinuousReader) init() error {
 }
 
 // ReadDatum reads and publishes Synchrophasor Datum records continuously
-func (c *ContinuousReader) ReadDatum(publish func(*pmu_server.SynchrophasorDatum_PhaseData, int64)) error {
+func (c *ContinuousReader) ReadDatum(publish func(*pmu_server.SynchrophasorDatum_PhaseData, float64)) error {
 	for {
 		if c.decoder == nil || !c.decoder.More() {
 			// init and bail if trouble
@@ -116,6 +116,7 @@ func (c *ContinuousReader) ReadDatum(publish func(*pmu_server.SynchrophasorDatum
 				if err != nil {
 					glog.Errorf("Skipping raw datum %v b/c error occured during parsing. Error: %v", raw, err)
 				} else {
+
 					// use callback to publish
 					publish(phase, deviceTs)
 
