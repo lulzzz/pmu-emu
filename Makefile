@@ -22,7 +22,7 @@ $(EXECUTABLE): $(shell find . -name '*.go' -not -path './vendor/*') proto
 
 clean:
 	find ./vendor -maxdepth 1 -not -path ./vendor -and -not -iname "vendor.json" -print0 | xargs -0 rm -Rf
-	cd $(GOPATH)/src/github.com/michaeldye/synchrophasor-proto && \
+	-cd ./vendor/github.com/michaeldye/synchrophasor-proto && \
 		make clean
 	rm -f $(EXECUTABLE)
 	rm -f Dockerfile-exec
@@ -69,7 +69,7 @@ publish: dirty clean test test-integration docker-push
 	git push -f --tags canonical master
 
 proto: deps
-	cd $(GOPATH)/src/github.com/michaeldye/synchrophasor-proto && \
+	cd ./vendor/github.com/michaeldye/synchrophasor-proto && \
 		make
 
 .PHONY: clean deps docker install lint publish proto test test-integration
