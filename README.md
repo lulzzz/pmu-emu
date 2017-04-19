@@ -10,7 +10,7 @@ Note: both below execution examples assume you've stored a sample data file (lik
 
 ### Example Docker container invocation
 
-    docker run --rm --name pmu-emu -p 127.0.0.1:8008:8008/tcp -e "DATA_PUBLISH_PAUSE_MS=500" -e "DEVICE_ID=15-Zbzvv-09" -e "DATA_FILE=/tmp/_a6_bus1_pmu_merged" -v /tmp/a6_bus1_pmu_merged:/tmp/a6_bus1_pmu_merged:ro -t summit.hovitos.engineering/$(uname -m)/pmu-emu:latest
+    docker run --rm --name pmu-emu -p 127.0.0.1:8008:8008/tcp -e "DATA_PUBLISH_PAUSE_MS=500" -e "DEVICE_ID=15-Zbzvv-09" -e "DATA_FILE=/tmp/_a6_bus1_pmu_merged" -v /tmp/_a6_bus1_pmu_merged:/tmp/_a6_bus1_pmu_merged:ro -t summit.hovitos.engineering/$(uname -m)/pmu-emu:latest
 
 ## Related Projects
 
