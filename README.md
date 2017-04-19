@@ -2,9 +2,13 @@
 
 A Power Management Unit (PMU) Emulator mostly used for execution in a Horizon environment. The system comprises a Golang binary and a JSON-formatted data file. The `pmu-emu` runs a gRPC server (on port `9009`) that continuously streams synchrophasor data to clients connected to this gRPC server.
 
-Example invocation:
+### Example native invocation
 
     DATA_PUBLISH_PAUSE_MS="500" DEVICE_ID="15-Zbzvv-09" DATA_FILE="/tmp/_a6_bus1_pmu_merged" pmu-emu -logtostderr -v 5
+
+### Example Docker container invocation
+
+    docker run --rm --name pmu-emu -p 127.0.0.1:8008:8008/tcp -t summit.hovitos.engineering/$(uname -m)/pmu-emu:latest
 
 ## Related Projects
 
@@ -14,14 +18,28 @@ Example invocation:
 
 ## Development
 
-### Preconditions
+### Environment setup
 
  * Install `make`
  * Install Golang v.1.7.x or newer, set up an appropriate `$GOPATH`, etc. (cf. https://golang.org/doc/install)
  * Install `protoc`, the Google protobuf compiler (cf. instructions at https://github.com/michaeldye/synchrophasor-proto)
- * Docker version 17.04.0-ce or newer
+ * Install Docker Community Edition version 17.04.0-ce or newer (cf. https://www.docker.com/community-edition#/download or use https://get.docker.com/)
 
-### Publishing a Docker Container
+## Building
+
+### Considerations
+
+This project requires that you build it from the proper place in your `$GOPATH`. Also note that it will automatically install `govendor` in your `$GOPATH` when executing `make deps`.
+
+### Compiling the executable
+
+    make
+
+### Creating a Docker execution container
+
+    make docker
+
+### Publishing
 
 This project include the make target `publish` that is intended to be executed after a PR has been merged. (Note: this scheme does not have a notion of producing staged development or integration builds, only publishing production stuff. There might be some utility in later producing a `publish-integration` target that is stamped appropriately).
 
@@ -31,14 +49,3 @@ This project include the make target `publish` that is intended to be executed a
   - Execute all tests (`make test test-integration`)
   - Build a docker container and push it to the repository (`make docker-push`)
   - If the above are successful, tag the `canonical` git repository with the current value in `VERSION`
-
-## Building
-
-### Considerations
-
-This project requires that you build it from the proper place in your `$GOPATH`. Also note that it will automatically install `govendor` in your `$GOPATH` when executing `make deps`.
-
-### Steps
-
-    make
-
