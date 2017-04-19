@@ -51,8 +51,6 @@ docker-push: docker
 	docker push $(DOCKER_IMAGE):$(DOCKER_TAG)
 	docker push $(DOCKER_IMAGE):latest
 
-install: $(EXECUTABLE)
-
 lint:
 	-golint ./... | grep -v "vendor/"
 	-go vet ./... 2>&1 | grep -vP "exit\ status|vendor/"
@@ -72,4 +70,4 @@ proto: deps
 	cd ./vendor/github.com/michaeldye/synchrophasor-proto && \
 		make
 
-.PHONY: clean deps docker install lint publish proto test test-integration
+.PHONY: clean deps docker install lint publish test test-integration
