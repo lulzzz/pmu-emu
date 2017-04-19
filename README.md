@@ -2,13 +2,15 @@
 
 A Power Management Unit (PMU) Emulator mostly used for execution in a Horizon environment. The system comprises a Golang binary and a JSON-formatted data file. The `pmu-emu` runs a gRPC server (on port `9009`) that continuously streams synchrophasor data to clients connected to this gRPC server.
 
+Note: both below execution examples assume you've stored a sample data file (like https://tor01.objectstorage.softlayer.net/v1/AUTH_bd05f276-e42f-4fa1-b7b3-780e8544769f/pmu-emu-data/_a6_bus1_pmu_merged?temp_url_sig=5cf9855857580c96dd903a013217206abaceec81&temp_url_expires=30001492637154) in `/tmp/_a6_bus1_pmu_merged`.
+
 ### Example native invocation
 
     DATA_PUBLISH_PAUSE_MS="500" DEVICE_ID="15-Zbzvv-09" DATA_FILE="/tmp/_a6_bus1_pmu_merged" pmu-emu -logtostderr -v 5
 
 ### Example Docker container invocation
 
-    docker run --rm --name pmu-emu -p 127.0.0.1:8008:8008/tcp -t summit.hovitos.engineering/$(uname -m)/pmu-emu:latest
+    docker run --rm --name pmu-emu -p 127.0.0.1:8008:8008/tcp -e "DATA_PUBLISH_PAUSE_MS=500" -e "DEVICE_ID=15-Zbzvv-09" -e "DATA_FILE=/tmp/_a6_bus1_pmu_merged" -v /tmp/a6_bus1_pmu_merged:/tmp/a6_bus1_pmu_merged:ro -t summit.hovitos.engineering/$(uname -m)/pmu-emu:latest
 
 ## Related Projects
 
