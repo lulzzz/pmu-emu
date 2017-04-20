@@ -86,7 +86,7 @@ func (w *SimpleTsDatumBroadcastWriter) Broadcast() error {
 			for id, reader := range w.DataReaders {
 				select {
 				case reader <- d:
-					glog.Infof("Published to reader: %v", id)
+					glog.V(5).Infof("Published to reader: %v", id)
 				default:
 					// Note that this doesn't close the socket or underlying gRPC connection, those are handled separately
 					glog.Infof("Connection stale or reader too slow, removing it: %v", id)
