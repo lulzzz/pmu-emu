@@ -79,7 +79,7 @@ func (w *SimpleTsDatumBroadcastWriter) Broadcast() error {
 		}
 
 		if len(w.DataReaders) == 0 {
-			glog.Errorf("Dropping message b/c there aren't any readers. Msg: %v", d)
+			glog.V(3).Infof("Dropping message b/c there aren't any readers. Msg: %v", d)
 		} else {
 
 			// write to all readers; will block until they read which means they need to be well-behaved
