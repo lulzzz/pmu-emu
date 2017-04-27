@@ -1,7 +1,10 @@
 FROM ##from_image##
 MAINTAINER mdye <mdye@us.ibm.com>
 
-ADD . /prj
+RUN mkdir -p /usr/local/synchrophasor/
+ADD ./pmu-emu /usr/local/synchrophasor/
+ADD ./VERSION /usr/local/synchrophasor/
 
 EXPOSE 8008
-CMD ["/prj/pmu-emu", "-v", "2", "-logtostderr"]
+WORKDIR /usr/local/synchrophasor/
+CMD ["./pmu-emu", "-v", "2", "-logtostderr"]
